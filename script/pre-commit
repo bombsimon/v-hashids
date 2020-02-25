@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+
+if [ "$(make fmt 2>&1  | grep -vc "Already formatted")" -gt 1 ]; then
+    exit 1
+fi
