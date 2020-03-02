@@ -11,8 +11,9 @@ fn main() {
         return
     }
 
-    h := hashid.new()
-    encoded := h.encode(os.args[1].int())
+    x := os.args[1..]
+    n := x.map(it.int())
+    encoded := hashid.new().encode(n)
 
     println(encoded)
 }

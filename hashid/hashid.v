@@ -1,47 +1,172 @@
 module hashid
 
+import (
+	math
+)
+
 const (
 	version = '1.0.0'
 	default_alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-	default_seps = 'cfhistuCFHISTU'
-	default_min_alphabet_length = 16
+	default_separators = 'cfhistuCFHISTU'
+	default_salt = 'this is salt'
 	default_min_hash_length = 0
-	default_salt = ''
+	min_alphabet_length = 16
+	ratio_separators = 3.5
+	ratio_guards = 12.0
 )
 
 struct HashID {
-	alphabet   string
-	seps       string
-	salt       string
+	alphabet   []string
+	salt       []string
+	separators []string
+	guards     []string
 	min_length int
 }
 
 pub fn new() HashID {
-	return new_with_config(default_alphabet, default_min_hash_length, default_salt)
+	return new_with_config(default_alphabet, default_salt, default_min_hash_length)
 }
 
-pub fn new_with_config(alphabet string, min_length int, salt string) HashID {
-	unique := unique_alphabet(alphabet)
-	if unique.len < default_min_alphabet_length {
-		panic('too short alphabet')
+pub fn new_with_config(alphabet_str, salt_str string, min_length int) HashID {
+	salt := salt_str.split('')
+	mut alphabet := alphabet_str.split('')
+	mut separators := default_separators.split('')
+	mut guards := []string
+	if alphabet.len < min_alphabet_length {
+		panic('alphabet to short')
 	}
-	alphabet_without_seps := remove_in(unique, default_seps)
-	seps_in_alphabet := remove_not_in(default_seps, unique)
+	// Alphabet should only contain unqiue characters
+	alphabet = unique_chars(alphabet)
+	// Alphabet should not contain separators, separators should only contain
+	// chars in alphabet.
+	alphabet = remove_in(alphabet, separators)
+	separators = remove_not_in(separators, alphabet)
+	separators = consistent_shuffle(separators, salt)
+	if separators.len == 0 || f32(alphabet.len / separators.len) > ratio_separators {
+		mut separators_length := int(math.ceil(f32(alphabet.len) / ratio_separators))
+		if separators_length == 1 {
+			separators_length = 2
+		}
+		if separators_length > separators.len {
+			diff := separators_length - separators.len
+			separators << alphabet[..diff]
+			alphabet << alphabet[diff..]
+		}
+		else {
+			separators = separators[..separators_length]
+		}
+	}
+	alphabet = consistent_shuffle(alphabet, salt)
+	guard_count := int(math.ceil(f32(alphabet.len) / ratio_guards))
+	if alphabet.len < 3 {
+		guards = separators[..guard_count]
+		separators = separators[guard_count..]
+	}
+	else {
+		guards = alphabet[..guard_count]
+		alphabet = alphabet[guard_count..]
+	}
 	return HashID{
-		alphabet: alphabet_without_seps
-		seps: seps_in_alphabet
+		alphabet: alphabet
 		salt: salt
+		separators: separators
+		guards: guards
 		min_length: min_length
 	}
 }
 
-pub fn (h HashID) encode(digit int) string {
-	return h.alphabet
+pub fn (h HashID) encode(digits []int) string {
+	if digits.len < 1 {
+		panic('cannot encode empty list')
+	}
+	for n in digits {
+		if n < 0 {
+			panic('cannot encode negative numbers')
+		}
+	}
+	mut alphabet_copy := [''].repeat(h.alphabet.len)
+	for i, v in h.alphabet {
+		alphabet_copy[i] = v
+	}
+	mut result := []string
+	mut number_hash := 0
+	for i, num in digits {
+		number_hash += (num % (i + 100))
+	}
+	lottery := h.alphabet[number_hash % alphabet_copy.len]
+	for i, _ in digits {
+		mut num := digits[i]
+		mut buf := lottery.split('')
+		buf << h.salt
+		buf << alphabet_copy
+		alphabet_copy = consistent_shuffle(alphabet_copy, buf[0..alphabet_copy.len])
+		last := _hash(num, alphabet_copy)
+		result << last
+		if i + 1 < digits.len {
+			num %= buf[0][0] + i
+			result << h.separators[num % h.separators.len]
+		}
+	}
+	if result.len < h.min_length {
+		mut new_result := h.guards[(number_hash + result[0][0]) % h.guards.len].split('')
+		new_result << result
+		result = new_result
+		if result.len < h.min_length {
+			result << h.guards[(number_hash + result[2][0]) % h.guards.len]
+		}
+	}
+	half_length := alphabet_copy.len / 2
+	for result.len < h.min_length {
+		alphabet_copy = consistent_shuffle(alphabet_copy, alphabet_copy)
+		mut new_result := alphabet_copy[half_length..]
+		new_result << result
+		new_result << alphabet_copy[0..half_length]
+		result = new_result
+		excess := result.len - h.min_length
+		if excess > 0 {
+			result[(excess / 2)..h.min_length]
+		}
+	}
+	return result.join('')
 }
 
-fn unique_alphabet(alphabet string) string {
+fn _hash(num int, alphabet []string) []string {
+	mut num_copy := num
+	mut result := ''
+	for num_copy > 0 {
+		alphabet_part := alphabet[num_copy % alphabet.len]
+		result = '$alphabet_part$result'
+		num_copy = num_copy / alphabet.len
+	}
+	return result.split('')
+}
+
+fn consistent_shuffle(str, salt []string) []string {
+	if salt.len < 1 {
+		return str
+	}
+	mut index := 0
+	mut integer_sum := 0
+	mut shuffled := str
+	for i := shuffled.len - 1; i > 0; i-- {
+		if salt[index].len > 1 {
+			panic('currently not supported with characters larger than one code point')
+		}
+		integer := salt[index][0]
+		integer_sum += integer
+		j := (integer + index + integer_sum) % i
+		s_i := shuffled[i]
+		s_j := shuffled[j]
+		shuffled[i] = s_j
+		shuffled[j] = s_i
+		index = (index + 1) % salt.len
+	}
+	return shuffled
+}
+
+fn unique_chars(chars []string) []string {
 	mut m := map[string]bool
-	for c in alphabet.split('') {
+	for c in chars {
 		m[c] = true
 	}
 	mut unique := []string
@@ -52,31 +177,27 @@ fn unique_alphabet(alphabet string) string {
 		unique << c
 	}
 	unique.sort()
-	return unique.join('')
+	return unique
 }
 
-fn remove_in(a, b string) string {
-	a_arr := a.split('')
-	b_arr := b.split('')
+fn remove_in(a, b []string) []string {
 	mut final_arr := []string
-	for x in a_arr {
-		if x in b_arr {
+	for x in a {
+		if x in b {
 			continue
 		}
 		final_arr << x
 	}
-	return final_arr.join('')
+	return final_arr
 }
 
-fn remove_not_in(a, b string) string {
-	a_arr := a.split('')
-	b_arr := b.split('')
+fn remove_not_in(a, b []string) []string {
 	mut final_arr := []string
-	for x in a_arr {
-		if !x in b_arr {
+	for x in a {
+		if !x in b {
 			continue
 		}
 		final_arr << x
 	}
-	return final_arr.join('')
+	return final_arr
 }
