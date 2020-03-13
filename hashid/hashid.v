@@ -6,7 +6,7 @@ import (
 
 const (
 	version = '1.0.0'
-	default_alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+	default_alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 	default_separators = 'cfhistuCFHISTU'
 	default_salt = 'this is salt'
 	default_min_hash_length = 0
@@ -130,6 +130,52 @@ pub fn (h HashID) encode(digits []int) string {
 	return result.join('')
 }
 
+pub fn (h HashID) decode(hash string) []int {
+	mut result := []int
+	mut breakdown := exchange_in(hash.split(''), h.guards, ' ')
+	mut array := breakdown.join('').split(' ')
+	mut idx := 0
+	if array.len == 2 || array.len == 3 {
+		idx = 1
+	}
+	if breakdown.len > 0 {
+		lottery := breakdown[0]
+		breakdown = exchange_in(breakdown[1..], h.separators, ' ')
+		array = breakdown.join('').split(' ')
+		for i := 0; i < array.len; i++ {
+			sub_hash := array[i]
+			mut buffer := lottery.split('')
+			buffer << h.salt
+			buffer << h.alphabet
+			new_alphabet := consistent_shuffle(h.alphabet, buffer[..h.alphabet.len])
+			result << _unhash(sub_hash, new_alphabet)
+		}
+	}
+	if h.encode(result) != hash {
+		println('Could not convert to old hash')
+		return []
+	}
+	return result
+}
+
+fn _unhash(hash string, alphabet []string) int {
+	mut result := 0
+	for _, c in hash.split('') {
+		mut pos := -1
+		for i, letter in alphabet {
+			if c == letter {
+				pos = i
+				break
+			}
+		}
+		if pos == -1 {
+			panic('could not get index of letter in hash')
+		}
+		result = result * alphabet.len + pos
+	}
+	return result
+}
+
 fn _hash(num int, alphabet []string) []string {
 	mut num_copy := num
 	mut result := ''
@@ -171,13 +217,25 @@ fn unique_chars(chars []string) []string {
 	}
 	mut unique := []string
 	for c, _ in m {
+		if c in unique {
+			panic('duplicate charcater found in alphabet')
+		}
 		if c == ' ' {
 			continue
 		}
 		unique << c
 	}
-	unique.sort()
-	return unique
+	return chars
+}
+
+fn exchange_in(str, replace []string, replace_with string) []string {
+	mut str_copy := str[..]
+	for i, c in str {
+		if c in replace {
+			str_copy[i] = replace_with
+		}
+	}
+	return str_copy
 }
 
 fn remove_in(a, b []string) []string {

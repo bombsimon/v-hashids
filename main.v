@@ -14,6 +14,9 @@ fn main() {
     x := os.args[1..]
     n := x.map(it.int())
     encoded := hashid.new().encode(n)
+    decoded := hashid.new().decode(encoded)
 
-    println(encoded)
+    println('given $n we encode to $encoded')
+
+    println('decoding $encoded gives $decoded')
 }
