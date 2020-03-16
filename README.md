@@ -7,11 +7,28 @@
 ## Usage
 
 ```v
-import hashid
+module main
+
+import (
+	hashid
+	os
+)
 
 fn main() {
-    h := hashid.new()
-    encoded := h.encode([33, 22, 32])  // y5q8r
+	if os.args.len < 2 {
+		println('missing number as argument')
+		return
+	}
+	//
+	x := os.args[1..]
+	n := x.map(it.int())
+	hid := hashid.new()
+	//
+	encoded := hid.encode(n)
+	decoded := hid.decode(encoded)
+	//
+	println('given $n we encode to $encoded')
+	println('decoding $encoded gives $decoded')
 }
 ```
 
