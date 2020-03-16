@@ -1,5 +1,6 @@
 ### vlang ###
 main
+examples/main
 
 # Created by https://www.gitignore.io/api/vim,macOS,v
 # Edit at https://www.gitignore.io/?templates=vim,macOS,v

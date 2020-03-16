@@ -1,4 +1,4 @@
-module hashid
+module hashids
 
 import (
 	math
@@ -331,7 +331,7 @@ fn copy_slice(to_copy []string) []string {
 // integers.
 fn hex_to_int(hex string) []int {
 	mut numbers := []int
-	for i, c in hex.split('') {
+	for _, c in hex.split('') {
 		mut b := c[0]
 		if b >= `0` && b <= `9` {
 			b -= `0`

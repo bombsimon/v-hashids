@@ -1,7 +1,7 @@
 module main
 
 import (
-	hashid
+	hashids
 	os
 )
 
@@ -13,7 +13,7 @@ fn main() {
 	//
 	x := os.args[1..]
 	n := x.map(it.int())
-	hid := hashid.new()
+	hid := hashids.new()
 	//
 	encoded := hid.encode(n)
 	decoded := hid.decode(encoded)

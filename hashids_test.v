@@ -1,4 +1,4 @@
-module hashid
+module hashids
 
 fn test_new_with_config() {
 	hid := new_with_config(default_alphabet, 'my salt', default_min_hash_length)
