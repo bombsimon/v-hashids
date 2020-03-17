@@ -142,13 +142,13 @@ pub fn (h HashID) encode(digits []int) string {
 	half_length := alphabet_copy.len / 2
 	for result.len < h.min_length {
 		alphabet_copy = consistent_shuffle(alphabet_copy, alphabet_copy)
-		mut new_result := alphabet_copy[half_length..]
+		mut new_result := copy_slice(alphabet_copy[half_length..])
 		new_result << result
-		new_result << alphabet_copy[0..half_length]
+		new_result << copy_slice(alphabet_copy[..half_length])
 		result = new_result
 		excess := result.len - h.min_length
 		if excess > 0 {
-			result[(excess / 2)..h.min_length]
+			result = result[(excess / 2)..(excess/2)+h.min_length]
 		}
 	}
 	return result.join('')
@@ -172,17 +172,18 @@ pub fn (h HashID) decode_hex(hash string) string {
 pub fn (h HashID) decode(hash string) []int {
 	mut result := []int
 	mut breakdown := exchange_in(hash.split(''), h.guards, ' ')
-	mut array := breakdown.join('').split(' ')
+	mut hashes := breakdown.join('').split(' ')
 	mut idx := 0
-	if array.len == 2 || array.len == 3 {
+	if hashes.len == 2 || hashes.len == 3 {
 		idx = 1
 	}
-	if breakdown.len > 0 {
-		lottery := breakdown[0]
-		breakdown = exchange_in(breakdown[1..], h.separators, ' ')
-		array = breakdown.join('').split(' ')
+    hash_brakedown := hashes[idx].split('')
+	if hash_brakedown.len > 0 {
+		lottery := hash_brakedown[0]
+		breakdown = exchange_in(hash_brakedown[1..], h.separators, ' ')
+		hashes = breakdown.join('').split(' ')
 		mut alphabet_copy := copy_slice(h.alphabet)
-		for _, sub_hash in array {
+		for _, sub_hash in hashes {
 			mut buffer := lottery.split('')
 			buffer << h.salt
 			buffer << alphabet_copy
