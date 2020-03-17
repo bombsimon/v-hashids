@@ -1,9 +1,9 @@
 module hashids
-
 /*
     All tests output is generated with the existing Go implementation to ensure
     correctness between different implementations.
 */
+
 
 fn test_new_with_config() {
 	hid := new_with_config(default_alphabet, 'my salt', default_min_hash_length)
@@ -30,9 +30,9 @@ fn test_encode_hex() {
 }
 
 fn test_encode_custom_alphabet() {
-    hid := new_with_config('abcdefghABCDEFGHxyzXYZ12345', 'salty', 10)
-    assert hid.encode_one(33) == '3AZ25zd45G'
-    assert hid.encode([101, 404, 500]) == 'BXyHAbDCzae'
+	hid := new_with_config('abcdefghABCDEFGHxyzXYZ12345', 'salty', 10)
+	assert hid.encode_one(33) == '3AZ25zd45G'
+	assert hid.encode([101, 404, 500]) == 'BXyHAbDCzae'
 }
 
 fn test_decode() {
@@ -56,9 +56,9 @@ fn test_decode_hex() {
 }
 
 fn test_decode_custom_alphabet() {
-    hid := new_with_config('abcdefghABCDEFGHxyzXYZ12345', 'salty', 10)
-    assert hid.decode_one('3AZ25zd45G') == 33
-    assert i_array_eq(hid.decode('BXyHAbDCzae'), [101, 404, 500])
+	hid := new_with_config('abcdefghABCDEFGHxyzXYZ12345', 'salty', 10)
+	assert hid.decode_one('3AZ25zd45G') == 33
+	assert i_array_eq(hid.decode('BXyHAbDCzae'), [101, 404, 500])
 }
 
 fn test_consistent_shuffle() {
@@ -72,6 +72,32 @@ fn test_consistent_shuffle() {
 	if !array_eq(do_not_change_me, do_not_change_me_orig) {
 		println('do not change me was: $do_not_change_me_orig')
 		println('do not change me is:  $do_not_change_me')
+	}
+}
+
+fn test_custom_alphabets() {
+	cases := ['cCsSfFhHuUiItT01',
+	'abdegjklCFHISTUc',
+	'abdegjklmnopqrSF',
+	'abdegjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890',
+	'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+\\|";:/?.>,<{[}]']
+	numbers := [1, 2, 3]
+	for _, c in cases {
+		hid := new_with_config(c, 'my salt', 0)
+		encoded := hid.encode(numbers)
+		decoded := hid.decode(encoded)
+		assert i_array_eq(decoded, numbers)
+	}
+}
+
+fn test_min_length() {
+	cases := [0, 1, 10, 999, 1000]
+	numbers := [1, 2, 3]
+	for _, min_length in cases {
+		hid := new_with_config(default_alphabet, 'my salt', min_length)
+		encoded := hid.encode(numbers)
+		decoded := hid.decode(encoded)
+		assert i_array_eq(decoded, numbers)
 	}
 }
 
