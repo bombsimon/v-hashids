@@ -6,13 +6,23 @@ Heaviliy inspired by previous implementations but mainly
 [go-hashids](https://github.com/speps/go-hashids) and
 [hashids.rb](https://github.com/peterhellberg/hashids.rb) - thank you!
 
+## Installation
+
+Currently `vpm` and general package management is a work in progress. Until
+then, clone this repository (as is or add as a submodule) to your project,
+ensure the folder is named `hashids` like the module.
+
+```sh
+$ git clone https://github.com/bombsimon/v-hashids.git hashids
+```
+
 ## Usage
 
 ```v
 module main
 
 import (
-	hashid
+	hashids
 	os
 )
 
