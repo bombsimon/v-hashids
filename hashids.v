@@ -63,7 +63,7 @@ pub fn new_with_config(alphabet_str, salt_str string, min_length int) HashID {
 		if separators_length > separators.len {
 			diff := separators_length - separators.len
 			separators << alphabet[..diff]
-			alphabet << alphabet[diff..]
+			alphabet = alphabet[diff..]
 		}
 		else {
 			separators = separators[..separators_length]
