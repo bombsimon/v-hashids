@@ -32,7 +32,6 @@ fn test_encode_hex() {
 fn test_encode_custom_alphabet() {
     hid := new_with_config('abcdefghABCDEFGHxyzXYZ12345', 'salty', 10)
     assert hid.encode_one(33) == '3AZ25zd45G'
-    println( hid.encode([101, 404, 500]))
     assert hid.encode([101, 404, 500]) == 'BXyHAbDCzae'
 }
 
@@ -54,6 +53,12 @@ fn test_decode_hex() {
 	hid := new()
 	assert hid.decode_hex('YMTbf0soIycPsDCGfOHzFbi4SMUNTNUEUJUZU2ils5s7SJfP') == '5a74d76ac89b05000e977baa'
 	assert hid.decode_hex('pqcJU1f2c7S4UZUY') == 'deadbeef'
+}
+
+fn test_decode_custom_alphabet() {
+    hid := new_with_config('abcdefghABCDEFGHxyzXYZ12345', 'salty', 10)
+    assert hid.decode_one('3AZ25zd45G') == 33
+    assert i_array_eq(hid.decode('BXyHAbDCzae'), [101, 404, 500])
 }
 
 fn test_consistent_shuffle() {
