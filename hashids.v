@@ -127,7 +127,7 @@ pub fn (h HashID) encode(digits []int) string {
 		last := hash(num, alphabet_copy)
 		result << last
 		if i + 1 < digits.len {
-			num %= buf[0][0] + i
+			num %= last[0][0] + i
 			result << h.separators[num % h.separators.len]
 		}
 	}

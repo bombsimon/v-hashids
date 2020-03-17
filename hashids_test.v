@@ -29,6 +29,13 @@ fn test_encode_hex() {
 	assert hid.encode_hex('DEADbeef') == 'pqcJU1f2c7S4UZUY'
 }
 
+fn test_encode_custom_alphabet() {
+    hid := new_with_config('abcdefghABCDEFGHxyzXYZ12345', 'salty', 10)
+    assert hid.encode_one(33) == '3AZ25zd45G'
+    println( hid.encode([101, 404, 500]))
+    assert hid.encode([101, 404, 500]) == 'BXyHAbDCzae'
+}
+
 fn test_decode() {
 	hid := new()
 	assert i_array_eq(hid.decode('ZqhOCd'), [33, 22, 33])
