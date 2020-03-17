@@ -148,7 +148,7 @@ pub fn (h HashID) encode(digits []int) string {
 		result = new_result
 		excess := result.len - h.min_length
 		if excess > 0 {
-			result = result[(excess / 2)..(excess/2)+h.min_length]
+			result = result[(excess / 2)..(excess / 2) + h.min_length]
 		}
 	}
 	return result.join('')
@@ -177,7 +177,7 @@ pub fn (h HashID) decode(hash string) []int {
 	if hashes.len == 2 || hashes.len == 3 {
 		idx = 1
 	}
-    hash_brakedown := hashes[idx].split('')
+	hash_brakedown := hashes[idx].split('')
 	if hash_brakedown.len > 0 {
 		lottery := hash_brakedown[0]
 		breakdown = exchange_in(hash_brakedown[1..], h.separators, ' ')

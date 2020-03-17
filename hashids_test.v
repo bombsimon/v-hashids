@@ -1,5 +1,10 @@
 module hashids
 
+/*
+    All tests output is generated with the existing Go implementation to ensure
+    correctness between different implementations.
+*/
+
 fn test_new_with_config() {
 	hid := new_with_config(default_alphabet, 'my salt', default_min_hash_length)
 	assert hid.alphabet.join('') != default_alphabet
@@ -9,8 +14,8 @@ fn test_encode() {
 	hid := new()
 	assert hid.encode([33, 22, 33]) == 'ZqhOCd'
 	assert hid.encode([333]) == '5Aj'
-    hid_min_len := new_with_config(default_alphabet, 'this is salt', 30)
-    assert hid_min_len.encode([33, 22, 33]) == 'KwX6ND91ylAaZqhOCdgQWzRMmLdrYb'
+	hid_min_len := new_with_config(default_alphabet, 'this is salt', 30)
+	assert hid_min_len.encode([33, 22, 33]) == 'KwX6ND91ylAaZqhOCdgQWzRMmLdrYb'
 }
 
 fn test_encode_one() {
@@ -28,8 +33,8 @@ fn test_decode() {
 	hid := new()
 	assert i_array_eq(hid.decode('ZqhOCd'), [33, 22, 33])
 	assert i_array_eq(hid.decode('5Aj'), [333])
-    hid_min_len := new_with_config(default_alphabet, 'this is salt', 30)
-    assert i_array_eq(hid_min_len.decode('KwX6ND91ylAaZqhOCdgQWzRMmLdrYb'), [33, 22, 33])
+	hid_min_len := new_with_config(default_alphabet, 'this is salt', 30)
+	assert i_array_eq(hid_min_len.decode('KwX6ND91ylAaZqhOCdgQWzRMmLdrYb'), [33, 22, 33])
 }
 
 fn test_decode_one() {
