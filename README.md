@@ -34,6 +34,8 @@ fn main() {
 }
 ```
 
+See [examples](examples) for more details.
+
 ### Create instance
 
 You can create an instance of the module with default or custom values in three
