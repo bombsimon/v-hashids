@@ -21,10 +21,8 @@ $ git clone https://github.com/bombsimon/v-hashids.git hashids
 ```v
 module main
 
-import (
-	hashids
-	os
-)
+import hashids
+import os
 
 fn main() {
 	if os.args.len < 2 {
@@ -109,9 +107,9 @@ use this library personally so I won't find bugs myself. I've tried to create
 reasonable test coverage where I compare to other implementations to ensure
 stability. If you find a bug, please report an issue.
 
-The version of `v` as of this writing is `V 0.1.25 5581b2b`. I intend to ensure
+The version of `v` as of this writing is `V 0.1.29 99dd72e`. I intend to ensure
 everything will still be working when `V 0.2.0` is released.
 
-The code formatting is not my personal flavour but a result of the current state
+The code formatting is not my personal flavor but a result of the current state
 of `v fmt`. This will change according to my suggestion in [this
 issue](https://github.com/vlang/v/issues/3917).

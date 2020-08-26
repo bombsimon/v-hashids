@@ -1,9 +1,7 @@
 module main
 
-import (
-	hashids
-	os
-)
+import hashids
+import os
 
 const (
 	alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'

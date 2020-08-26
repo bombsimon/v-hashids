@@ -1,10 +1,9 @@
 module hashids
+
 /*
-    All tests output is generated with the existing Go implementation to ensure
+All tests output is generated with the existing Go implementation to ensure
     correctness between different implementations.
 */
-
-
 fn test_new_with_config() {
 	hid := new_with_config(default_alphabet, 'my salt', default_min_hash_length)
 	assert hid.alphabet.join('') != default_alphabet
@@ -62,25 +61,27 @@ fn test_decode_custom_alphabet() {
 }
 
 fn test_consistent_shuffle() {
-	assert array_eq(consistent_shuffle(_s('abc'), _s('my salt')), _s('bca'))
-	assert array_eq(consistent_shuffle(_s('abcABC123'), _s('xxx')), _s('2AC1b3cBa'))
+	assert array_eq(consistent_shuffle(string_to_slice('abc'), string_to_slice('my salt')),
+		string_to_slice('bca'))
+	assert array_eq(consistent_shuffle(string_to_slice('abcABC123'), string_to_slice('xxx')),
+		string_to_slice('2AC1b3cBa'))
 	// Ensure shuffle doesn't change the passed value in place.
-	do_not_change_me := _s('abcdefABCDEF')
+	do_not_change_me := string_to_slice('abcdefABCDEF')
 	do_not_change_me_orig := copy_slice(do_not_change_me)
-	shuffled := consistent_shuffle(do_not_change_me, _s('some salty salt'))
+	consistent_shuffle(do_not_change_me, string_to_slice('some salty salt'))
 	assert array_eq(do_not_change_me, do_not_change_me_orig)
 	if !array_eq(do_not_change_me, do_not_change_me_orig) {
 		println('do not change me was: $do_not_change_me_orig')
 		println('do not change me is:  $do_not_change_me')
+	} else {
+		print("i\'m just printing this due to https://github.com/vlang/v/issues/3420")
 	}
 }
 
 fn test_custom_alphabets() {
-	cases := ['cCsSfFhHuUiItT01',
-	'abdegjklCFHISTUc',
-	'abdegjklmnopqrSF',
-	'abdegjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890',
-	'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+\\|";:/?.>,<{[}]']
+	cases := ['cCsSfFhHuUiItT01', 'abdegjklCFHISTUc', 'abdegjklmnopqrSF', 'abdegjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890',
+		'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+\\|";:/?.>,<{[}]',
+	]
 	numbers := [1, 2, 3]
 	for _, c in cases {
 		hid := new_with_config(c, 'my salt', 0)
@@ -102,33 +103,37 @@ fn test_min_length() {
 }
 
 fn test_unique_chars() {
-	assert array_eq(unique_chars(_s('abc')), _s('abc'))
-	assert array_eq(unique_chars(_s('aaabbcc')), _s('abc'))
-	assert array_eq(unique_chars(_s('aaaaaabbccccaaa')), _s('abc'))
-	assert array_eq(unique_chars(_s('abc123abc123')), _s('abc123'))
+	assert array_eq(unique_chars(string_to_slice('abc')), string_to_slice('abc'))
+	assert array_eq(unique_chars(string_to_slice('aaabbcc')), string_to_slice('abc'))
+	assert array_eq(unique_chars(string_to_slice('aaaaaabbccccaaa')), string_to_slice('abc'))
+	assert array_eq(unique_chars(string_to_slice('abc123abc123')), string_to_slice('abc123'))
 }
 
 fn test_exchange_in() {
-	assert array_eq(exchange_in(_s('abcdeABCDE'), _s('bB'), 'X'), _s('aXcdeAXCDE'))
-	assert array_eq(exchange_in(_s('abc'), _s('abc'), 'f'), _s('fff'))
-	assert array_eq(exchange_in(_s('abc'), _s('def'), 'X'), _s('abc'))
+	assert array_eq(exchange_in(string_to_slice('abcdeABCDE'), string_to_slice('bB'),
+		'X'), string_to_slice('aXcdeAXCDE'))
+	assert array_eq(exchange_in(string_to_slice('abc'), string_to_slice('abc'), 'f'),
+		string_to_slice('fff'))
+	assert array_eq(exchange_in(string_to_slice('abc'), string_to_slice('def'), 'X'),
+		string_to_slice('abc'))
 }
 
 fn test_remove_in() {
-	assert array_eq(remove_in(_s('abcde'), _s('de')), _s('abc'))
-	assert array_eq(remove_in(_s('abc'), _s('abc')), [])
-	assert array_eq(remove_in(_s('abc'), _s('xyz')), _s('abc'))
+	assert array_eq(remove_in(string_to_slice('abcde'), string_to_slice('de')), string_to_slice('abc'))
+	assert array_eq(remove_in(string_to_slice('abc'), string_to_slice('abc')), [])
+	assert array_eq(remove_in(string_to_slice('abc'), string_to_slice('xyz')), string_to_slice('abc'))
 }
 
 fn test_remove_not_in() {
-	assert array_eq(remove_not_in(_s('abcde'), _s('abc')), _s('abc'))
-	assert array_eq(remove_not_in(_s('abc'), _s('def')), [])
-	assert array_eq(remove_not_in(_s('aabbcc'), _s('axy')), _s('aa'))
+	assert array_eq(remove_not_in(string_to_slice('abcde'), string_to_slice('abc')), string_to_slice('abc'))
+	assert array_eq(remove_not_in(string_to_slice('abc'), string_to_slice('def')), [])
+	assert array_eq(remove_not_in(string_to_slice('aabbcc'), string_to_slice('axy')),
+		string_to_slice('aa'))
 }
 
 fn test_copy_slice() {
-	assert array_eq(copy_slice(_s('abc')), _s('abc'))
-	assert array_eq(copy_slice(_s('')), [])
+	assert array_eq(copy_slice(string_to_slice('abc')), string_to_slice('abc'))
+	assert array_eq(copy_slice(string_to_slice('')), [])
 }
 
 fn array_eq(a, b []string) bool {
@@ -155,6 +160,6 @@ fn i_array_eq(a, b []int) bool {
 	return true
 }
 
-fn _s(s string) []string {
+fn string_to_slice(s string) []string {
 	return s.split('')
 }

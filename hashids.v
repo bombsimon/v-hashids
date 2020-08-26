@@ -1,19 +1,18 @@
 module hashids
 
-import (
-	math
-)
+import math
 
 const (
-	version = '0.1.0'
-	default_alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
-	default_separators = 'cfhistuCFHISTU'
-	default_salt = 'this is salt'
+	version                 = '0.1.0'
+	default_alphabet        = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+	default_separators      = 'cfhistuCFHISTU'
+	default_salt            = 'this is salt'
 	default_min_hash_length = 0
-	min_alphabet_length = 16
-	ratio_separators = 3.5
-	ratio_guards = 12.0
+	min_alphabet_length     = 16
+	ratio_separators        = 3.5
+	ratio_guards            = 12.0
 )
+
 // HashID is the type holding the alphabet, salt, separators and guards.
 struct HashID {
 	alphabet   []string
@@ -40,7 +39,7 @@ pub fn new_with_salt(salt string) HashID {
 pub fn new_with_config(alphabet_str, salt_str string, min_length int) HashID {
 	mut alphabet := alphabet_str.split('')
 	mut separators := default_separators.split('')
-	mut guards := []string
+	mut guards := []string{}
 	salt := salt_str.split('')
 	if alphabet.len < min_alphabet_length {
 		panic('alphabet to short')
@@ -64,8 +63,7 @@ pub fn new_with_config(alphabet_str, salt_str string, min_length int) HashID {
 			diff := separators_length - separators.len
 			separators << alphabet[..diff]
 			alphabet = alphabet[diff..]
-		}
-		else {
+		} else {
 			separators = separators[..separators_length]
 		}
 	}
@@ -74,8 +72,7 @@ pub fn new_with_config(alphabet_str, salt_str string, min_length int) HashID {
 	if alphabet.len < 3 {
 		guards = separators[..guard_count]
 		separators = separators[guard_count..]
-	}
-	else {
+	} else {
 		guards = alphabet[..guard_count]
 		alphabet = alphabet[guard_count..]
 	}
@@ -111,7 +108,7 @@ pub fn (h HashID) encode(digits []int) string {
 		}
 	}
 	mut alphabet_copy := copy_slice(h.alphabet)
-	mut result := []string
+	mut result := []string{}
 	mut number_hash := 0
 	for i, num in digits {
 		number_hash += (num % (i + 100))
@@ -170,7 +167,7 @@ pub fn (h HashID) decode_hex(hash string) string {
 // decode will decode a hash and return a list of integers they were encoded
 // from.
 pub fn (h HashID) decode(hash string) []int {
-	mut result := []int
+	mut result := []int{}
 	mut breakdown := exchange_in(hash.split(''), h.guards, ' ')
 	mut hashes := breakdown.join('').split(' ')
 	mut idx := 0
@@ -261,8 +258,8 @@ fn consistent_shuffle(str, salt []string) []string {
 // unique_chars will walk over a slice of strings and remove duplicates. Only
 // the first occurrence will persist in the result.
 fn unique_chars(chars []string) []string {
-	mut m := map[string]bool
-	mut unique := []string
+	mut m := map[string]bool{}
+	mut unique := []string{}
 	for c in chars {
 		if m[c] {
 			continue
@@ -295,7 +292,7 @@ fn exchange_in(str, replace []string, replace_with string) []string {
 // remove_in takes two slices and removes every occurrence in the first slice if
 // if they're present in the second slice.
 fn remove_in(a, b []string) []string {
-	mut final_arr := []string
+	mut final_arr := []string{}
 	for x in a {
 		if x in b {
 			continue
@@ -308,9 +305,9 @@ fn remove_in(a, b []string) []string {
 // remove_not_in takes two slices and removes every occurrence in the first
 // slice if they're not present in the second slice.
 fn remove_not_in(a, b []string) []string {
-	mut final_arr := []string
+	mut final_arr := []string{}
 	for x in a {
-		if !x in b {
+		if !(x in b) {
 			continue
 		}
 		final_arr << x
@@ -331,22 +328,19 @@ fn copy_slice(to_copy []string) []string {
 // each position to it's integer representation. The return value is a list of
 // integers.
 fn hex_to_int(hex string) []int {
-	mut numbers := []int
+	mut numbers := []int{}
 	for _, c in hex.split('') {
 		mut b := c[0]
 		if b >= `0` && b <= `9` {
 			b -= `0`
-		}
-		else if b >= `a` && b <= `f` {
+		} else if b >= `a` && b <= `f` {
 			b -= `a` - `A`
 			if b >= `A` && b <= `F` {
 				b -= (`A` - 0xA)
 			}
-		}
-		else if b >= `A` && b <= `F` {
+		} else if b >= `A` && b <= `F` {
 			b -= (`A` - 0xA)
-		}
-		else {
+		} else {
 			panic('invalid hex')
 		}
 		numbers << 0x10 + b
@@ -358,7 +352,7 @@ fn hex_to_int(hex string) []int {
 // equvivalent is added to the returned string.
 fn int_to_hex(numbers []int) string {
 	hex := '0123456789abcdef'.split('')
-	mut result := []string
+	mut result := []string{}
 	for n in numbers {
 		if n < 0x10 || n > 0x1f {
 			panic('invalid number')
