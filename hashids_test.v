@@ -136,7 +136,7 @@ fn test_copy_slice() {
 	assert array_eq(copy_slice(string_to_slice('')), [])
 }
 
-fn array_eq(a, b []string) bool {
+fn array_eq(a []string, b []string) bool {
 	if a.len != b.len {
 		return false
 	}
@@ -148,7 +148,7 @@ fn array_eq(a, b []string) bool {
 	return true
 }
 
-fn i_array_eq(a, b []int) bool {
+fn i_array_eq(a []int, b []int) bool {
 	if a.len != b.len {
 		return false
 	}

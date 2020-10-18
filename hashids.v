@@ -36,7 +36,7 @@ pub fn new_with_salt(salt string) HashID {
 
 // new_with_config will create a HashID instance with desired alphabet, salt and
 // minimum hash length.
-pub fn new_with_config(alphabet_str, salt_str string, min_length int) HashID {
+pub fn new_with_config(alphabet_str string, salt_str string, min_length int) HashID {
 	mut alphabet := alphabet_str.split('')
 	mut separators := default_separators.split('')
 	mut guards := []string{}
@@ -232,7 +232,7 @@ fn hash(num int, alphabet []string) []string {
 // consistent_shuffle takes a string slice and a salt (as a string slie) and
 // moves characters in the string slice in a consistent way toe nsure the same
 // result every time.
-fn consistent_shuffle(str, salt []string) []string {
+fn consistent_shuffle(str []string, salt []string) []string {
 	if salt.len < 1 {
 		return str
 	}
@@ -279,7 +279,7 @@ fn unique_chars(chars []string) []string {
 // argument which is what to replace with.
 // Example:
 // exchange_in(['a', 'b', 'c'], ['b', 'c'], 'X') // ['a', 'X', 'X']
-fn exchange_in(str, replace []string, replace_with string) []string {
+fn exchange_in(str []string, replace []string, replace_with string) []string {
 	mut str_copy := copy_slice(str)
 	for i, c in str {
 		if c in replace {
@@ -291,7 +291,7 @@ fn exchange_in(str, replace []string, replace_with string) []string {
 
 // remove_in takes two slices and removes every occurrence in the first slice if
 // if they're present in the second slice.
-fn remove_in(a, b []string) []string {
+fn remove_in(a []string, b []string) []string {
 	mut final_arr := []string{}
 	for x in a {
 		if x in b {
@@ -304,7 +304,7 @@ fn remove_in(a, b []string) []string {
 
 // remove_not_in takes two slices and removes every occurrence in the first
 // slice if they're not present in the second slice.
-fn remove_not_in(a, b []string) []string {
+fn remove_not_in(a []string, b []string) []string {
 	mut final_arr := []string{}
 	for x in a {
 		if !(x in b) {
@@ -330,16 +330,16 @@ fn copy_slice(to_copy []string) []string {
 fn hex_to_int(hex string) []int {
 	mut numbers := []int{}
 	for _, c in hex.split('') {
-		mut b := c[0]
-		if b >= `0` && b <= `9` {
-			b -= `0`
-		} else if b >= `a` && b <= `f` {
-			b -= `a` - `A`
-			if b >= `A` && b <= `F` {
-				b -= (`A` - 0xA)
+		mut b := int(c[0])
+		if b >= int(`0`) && b <= int(`9`) {
+			b -= int(`0`)
+		} else if b >= int(`a`) && b <= int(`f`) {
+			b -= int(`a`) - int(`A`)
+			if b >= int(`A`) && b <= int(`F`) {
+				b -= (int(`A`) - 0xA)
 			}
-		} else if b >= `A` && b <= `F` {
-			b -= (`A` - 0xA)
+		} else if b >= int(`A`) && b <= int(`F`) {
+			b -= (int(`A`) - 0xA)
 		} else {
 			panic('invalid hex')
 		}
