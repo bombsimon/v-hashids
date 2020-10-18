@@ -4,8 +4,8 @@ import hashids
 import os
 
 const (
-	alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
-	salt = 'this is salt'
+	alphabet        = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+	salt            = 'this is salt'
 	min_hash_length = 30
 )
 
