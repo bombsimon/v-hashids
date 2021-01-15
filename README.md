@@ -107,8 +107,8 @@ use this library personally so I won't find bugs myself. I've tried to create
 reasonable test coverage where I compare to other implementations to ensure
 stability. If you find a bug, please report an issue.
 
-The version of `v` as of this writing is `V 0.1.29 99dd72e`. I intend to ensure
-everything will still be working when `V 0.2.0` is released.
+The version of `v` as of this writing is `V 0.2.1 c6099df`. I intend to ensure
+everything is working as long as possible.
 
 The code formatting is not my personal flavor but a result of the current state
 of `v fmt`. This will change according to my suggestion in [this

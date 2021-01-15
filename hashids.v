@@ -128,10 +128,11 @@ pub fn (h HashID) encode(digits []int) string {
 			result << h.separators[num % h.separators.len]
 		}
 	}
+
 	if result.len < h.min_length {
 		mut new_result := h.guards[(number_hash + result[0][0]) % h.guards.len].split('')
 		new_result << result
-		result = new_result
+		result = new_result.clone()
 		if result.len < h.min_length {
 			result << h.guards[(number_hash + result[2][0]) % h.guards.len]
 		}
@@ -142,7 +143,7 @@ pub fn (h HashID) encode(digits []int) string {
 		mut new_result := copy_slice(alphabet_copy[half_length..])
 		new_result << result
 		new_result << copy_slice(alphabet_copy[..half_length])
-		result = new_result
+		result = new_result.clone()
 		excess := result.len - h.min_length
 		if excess > 0 {
 			result = result[(excess / 2)..(excess / 2) + h.min_length]

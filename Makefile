@@ -2,7 +2,7 @@ V ?= v
 
 .PHONY: fmt
 fmt:
-	$(V) fmt -w */**.v
+	$(V) fmt -w **/**.v
 
 .PHONY: hooks
 hooks:
