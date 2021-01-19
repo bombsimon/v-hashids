@@ -29,13 +29,16 @@ fn main() {
 		println('missing number as argument')
 		return
 	}
+
 	// Read command line arguments and convert to integer slice.
 	x := os.args[1..]
 	n := x.map(it.int())
 	hid := hashid.new()
+
 	// Encode the number(s)
 	encoded := hid.encode(n)
 	println('given $n we encode to $encoded')
+
 	// Decode the hash to ensure we get the same numbers back.
 	decoded := hid.decode(encoded)
 	println('decoding $encoded gives $decoded')
@@ -72,6 +75,7 @@ hid := hashids.newwith_config(alphabet, salt, min_length)
 ```v
 // Encode a slice of integer(s)
 hash := hid.encode([1, 2, 3])
+
 // Decode to slice of integers
 numbers := hid.decode(hash)
 ```
@@ -79,6 +83,7 @@ numbers := hid.decode(hash)
 ```v
 // Encode a single number
 hash := hid.encode_one(1)
+
 // Decode to a single integer
 number := hid.decode_one(hash)
 ```
@@ -86,6 +91,7 @@ number := hid.decode_one(hash)
 ```v
 // Encode hexadecimal string
 hash := hid.encode_hex('f00ba12')
+
 // Decode to hexadecimal string
 hex := hid.decode_hex(hash)
 ```
@@ -109,7 +115,3 @@ stability. If you find a bug, please report an issue.
 
 The version of `v` as of this writing is `V 0.2.1 c6099df`. I intend to ensure
 everything is working as long as possible.
-
-The code formatting is not my personal flavor but a result of the current state
-of `v fmt`. This will change according to my suggestion in [this
-issue](https://github.com/vlang/v/issues/3917).

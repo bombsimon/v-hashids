@@ -41,24 +41,31 @@ pub fn new_with_config(alphabet_str string, salt_str string, min_length int) Has
 	mut separators := default_separators.split('')
 	mut guards := []string{}
 	salt := salt_str.split('')
+
 	if alphabet.len < min_alphabet_length {
-		panic('alphabet to short')
+		panic('alphabet too short')
 	}
+
 	if ' ' in alphabet {
 		panic('alphabet may not contain spaces')
 	}
 	// Alphabet should only contain unqiue characters
 	alphabet = unique_chars(alphabet)
+
 	// Separators should only contain characters in alphabet.
 	separators = remove_not_in(separators, alphabet)
+
 	// Alphabet should not contain characters in separators.
 	alphabet = remove_in(alphabet, separators)
+
 	separators = consistent_shuffle(separators, salt)
 	if separators.len == 0 || f64(alphabet.len / separators.len) > ratio_separators {
 		mut separators_length := int(math.ceil(f64(alphabet.len) / ratio_separators))
+
 		if separators_length == 1 {
 			separators_length = 2
 		}
+
 		if separators_length > separators.len {
 			diff := separators_length - separators.len
 			separators << alphabet[..diff]
@@ -67,8 +74,10 @@ pub fn new_with_config(alphabet_str string, salt_str string, min_length int) Has
 			separators = separators[..separators_length]
 		}
 	}
+
 	alphabet = consistent_shuffle(alphabet, salt)
 	guard_count := int(math.ceil(f64(alphabet.len) / ratio_guards))
+
 	if alphabet.len < 3 {
 		guards = separators[..guard_count]
 		separators = separators[guard_count..]
@@ -76,6 +85,7 @@ pub fn new_with_config(alphabet_str string, salt_str string, min_length int) Has
 		guards = alphabet[..guard_count]
 		alphabet = alphabet[guard_count..]
 	}
+
 	return HashID{
 		alphabet: alphabet
 		salt: salt
@@ -102,19 +112,24 @@ pub fn (h HashID) encode(digits []int) string {
 	if digits.len < 1 {
 		panic('cannot encode empty list')
 	}
+
 	for n in digits {
 		if n < 0 {
 			panic('cannot encode negative numbers')
 		}
 	}
+
 	mut alphabet_copy := copy_slice(h.alphabet)
 	mut result := []string{}
 	mut number_hash := 0
+
 	for i, num in digits {
 		number_hash += (num % (i + 100))
 	}
+
 	lottery := h.alphabet[number_hash % alphabet_copy.len]
 	result << lottery
+
 	for i, _ in digits {
 		mut num := digits[i]
 		mut buf := lottery.split('')
@@ -123,6 +138,7 @@ pub fn (h HashID) encode(digits []int) string {
 		alphabet_copy = consistent_shuffle(alphabet_copy, buf[..alphabet_copy.len])
 		last := hash(num, alphabet_copy)
 		result << last
+
 		if i + 1 < digits.len {
 			num %= last[0][0] + i
 			result << h.separators[num % h.separators.len]
@@ -133,22 +149,27 @@ pub fn (h HashID) encode(digits []int) string {
 		mut new_result := h.guards[(number_hash + result[0][0]) % h.guards.len].split('')
 		new_result << result
 		result = new_result.clone()
+
 		if result.len < h.min_length {
 			result << h.guards[(number_hash + result[2][0]) % h.guards.len]
 		}
 	}
+
 	half_length := alphabet_copy.len / 2
+
 	for result.len < h.min_length {
 		alphabet_copy = consistent_shuffle(alphabet_copy, alphabet_copy)
 		mut new_result := copy_slice(alphabet_copy[half_length..])
 		new_result << result
 		new_result << copy_slice(alphabet_copy[..half_length])
 		result = new_result.clone()
+
 		excess := result.len - h.min_length
 		if excess > 0 {
 			result = result[(excess / 2)..(excess / 2) + h.min_length]
 		}
 	}
+
 	return result.join('')
 }
 
@@ -171,28 +192,34 @@ pub fn (h HashID) decode(hash string) []int {
 	mut result := []int{}
 	mut breakdown := exchange_in(hash.split(''), h.guards, ' ')
 	mut hashes := breakdown.join('').split(' ')
+
 	mut idx := 0
 	if hashes.len == 2 || hashes.len == 3 {
 		idx = 1
 	}
+
 	hash_brakedown := hashes[idx].split('')
 	if hash_brakedown.len > 0 {
 		lottery := hash_brakedown[0]
 		breakdown = exchange_in(hash_brakedown[1..], h.separators, ' ')
 		hashes = breakdown.join('').split(' ')
 		mut alphabet_copy := copy_slice(h.alphabet)
+
 		for _, sub_hash in hashes {
 			mut buffer := lottery.split('')
 			buffer << h.salt
 			buffer << alphabet_copy
+
 			alphabet_copy = consistent_shuffle(alphabet_copy, buffer[..alphabet_copy.len])
 			result << unhash(sub_hash, alphabet_copy)
 		}
 	}
+
 	if h.encode(result) != hash {
 		println('Could not convert to old hash')
 		return []
 	}
+
 	return result
 }
 
@@ -200,6 +227,7 @@ pub fn (h HashID) decode(hash string) []int {
 // (sub) hash and return it's integer representation.
 fn unhash(hash string, alphabet []string) int {
 	mut result := 0
+
 	for _, c in hash.split('') {
 		mut pos := -1
 		for i, letter in alphabet {
@@ -208,11 +236,14 @@ fn unhash(hash string, alphabet []string) int {
 				break
 			}
 		}
+
 		if pos == -1 {
 			panic('could not get index of letter in hash')
 		}
+
 		result = result * alphabet.len + pos
 	}
+
 	return result
 }
 
@@ -222,37 +253,45 @@ fn unhash(hash string, alphabet []string) int {
 fn hash(num int, alphabet []string) []string {
 	mut num_copy := num
 	mut result := ''
+
 	for num_copy > 0 {
 		alphabet_part := alphabet[num_copy % alphabet.len]
 		result = '$alphabet_part$result'
 		num_copy = num_copy / alphabet.len
 	}
+
 	return result.split('')
 }
 
-// consistent_shuffle takes a string slice and a salt (as a string slie) and
-// moves characters in the string slice in a consistent way toe nsure the same
+// consistent_shuffle takes a string slice and a salt (as a string slice) and
+// moves characters in the string slice in a consistent way to  ensure the same
 // result every time.
 fn consistent_shuffle(str []string, salt []string) []string {
 	if salt.len < 1 {
 		return str
 	}
+
 	mut index := 0
 	mut integer_sum := 0
 	mut shuffled := copy_slice(str)
+
 	for i := shuffled.len - 1; i > 0; i-- {
 		if salt[index].len > 1 {
 			panic('currently not supported with characters larger than one code point')
 		}
+
 		integer := salt[index][0]
 		integer_sum += integer
+
 		j := (integer + index + integer_sum) % i
 		s_i := shuffled[i]
 		s_j := shuffled[j]
+
 		shuffled[i] = s_j
 		shuffled[j] = s_i
 		index = (index + 1) % salt.len
 	}
+
 	return shuffled
 }
 
@@ -261,16 +300,20 @@ fn consistent_shuffle(str []string, salt []string) []string {
 fn unique_chars(chars []string) []string {
 	mut m := map[string]bool{}
 	mut unique := []string{}
+
 	for c in chars {
 		if m[c] {
 			continue
 		}
+
 		if c == ' ' {
 			continue
 		}
+
 		unique << c
 		m[c] = true
 	}
+
 	return unique
 }
 
@@ -282,11 +325,13 @@ fn unique_chars(chars []string) []string {
 // exchange_in(['a', 'b', 'c'], ['b', 'c'], 'X') // ['a', 'X', 'X']
 fn exchange_in(str []string, replace []string, replace_with string) []string {
 	mut str_copy := copy_slice(str)
+
 	for i, c in str {
 		if c in replace {
 			str_copy[i] = replace_with
 		}
 	}
+
 	return str_copy
 }
 
@@ -294,12 +339,15 @@ fn exchange_in(str []string, replace []string, replace_with string) []string {
 // if they're present in the second slice.
 fn remove_in(a []string, b []string) []string {
 	mut final_arr := []string{}
+
 	for x in a {
 		if x in b {
 			continue
 		}
+
 		final_arr << x
 	}
+
 	return final_arr
 }
 
@@ -307,21 +355,26 @@ fn remove_in(a []string, b []string) []string {
 // slice if they're not present in the second slice.
 fn remove_not_in(a []string, b []string) []string {
 	mut final_arr := []string{}
+
 	for x in a {
 		if !(x in b) {
 			continue
 		}
+
 		final_arr << x
 	}
+
 	return final_arr
 }
 
 // copy_slice creates a copy of a string slice.
 fn copy_slice(to_copy []string) []string {
 	mut new := [''].repeat(to_copy.len)
+
 	for i, v in to_copy {
 		new[i] = v
 	}
+
 	return new
 }
 
@@ -330,8 +383,10 @@ fn copy_slice(to_copy []string) []string {
 // integers.
 fn hex_to_int(hex string) []int {
 	mut numbers := []int{}
+
 	for _, c in hex.split('') {
 		mut b := int(c[0])
+
 		if b >= int(`0`) && b <= int(`9`) {
 			b -= int(`0`)
 		} else if b >= int(`a`) && b <= int(`f`) {
@@ -344,8 +399,10 @@ fn hex_to_int(hex string) []int {
 		} else {
 			panic('invalid hex')
 		}
+
 		numbers << 0x10 + b
 	}
+
 	return numbers
 }
 
@@ -354,11 +411,14 @@ fn hex_to_int(hex string) []int {
 fn int_to_hex(numbers []int) string {
 	hex := '0123456789abcdef'.split('')
 	mut result := []string{}
+
 	for n in numbers {
 		if n < 0x10 || n > 0x1f {
 			panic('invalid number')
 		}
+
 		result << hex[n - 0x10]
 	}
+
 	return result.join('')
 }

@@ -74,7 +74,7 @@ fn test_consistent_shuffle() {
 		println('do not change me was: $do_not_change_me_orig')
 		println('do not change me is:  $do_not_change_me')
 	} else {
-		print("i\'m just printing this due to https://github.com/vlang/v/issues/3420")
+		print("i'm just printing this due to https://github.com/vlang/v/issues/3420")
 	}
 }
 

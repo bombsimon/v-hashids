@@ -14,8 +14,10 @@ fn main() {
 		println('missing number as argument')
 		return
 	}
+
 	x := os.args[1..]
 	n := x.map(it.int())
+
 	example_default_values(n)
 	example_custom_values(n)
 }
@@ -24,6 +26,7 @@ fn example_default_values(n []int) {
 	hid := hashids.new()
 	encoded := hid.encode(n)
 	decoded := hid.decode(encoded)
+
 	display_result(n, encoded, decoded, 0)
 }
 
@@ -31,6 +34,7 @@ fn example_custom_values(n []int) {
 	hid := hashids.new_with_config(alphabet, salt, min_hash_length)
 	encoded := hid.encode(n)
 	decoded := hid.decode(encoded)
+
 	display_result(n, encoded, decoded, min_hash_length)
 }
 

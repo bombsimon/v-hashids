@@ -2,7 +2,7 @@ V ?= v
 
 .PHONY: fmt
 fmt:
-	$(V) fmt -w **/**.v
+	$(V) fmt -w $(shell find . -name "*.v")
 
 .PHONY: hooks
 hooks:
