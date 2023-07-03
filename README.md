@@ -2,7 +2,7 @@
 
 [v](https://vlang.io/) implementation of [Hash IDs](http://hashids.org).
 
-Heaviliy inspired by previous implementations but mainly
+Heavily inspired by previous implementations but mainly
 [go-hashids](https://github.com/speps/go-hashids) and
 [hashids.rb](https://github.com/peterhellberg/hashids.rb) - thank you!
 
@@ -13,7 +13,7 @@ then, clone this repository (as is or add as a submodule) to your project,
 ensure the folder is named `hashids` like the module.
 
 ```sh
-$ git clone https://github.com/bombsimon/v-hashids.git hashids
+git clone https://github.com/bombsimon/v-hashids.git hashids
 ```
 
 ## Usage
@@ -46,6 +46,10 @@ fn main() {
 ```
 
 See [examples](examples) for more details.
+
+```sh
+v run examples 1 2 3
+```
 
 ### Create instance
 
@@ -99,7 +103,7 @@ hex := hid.decode_hex(hash)
 ## Testing
 
 ```sh
-$ v test hashid
+v test .
 ```
 
 ## Licence
@@ -113,5 +117,5 @@ use this library personally so I won't find bugs myself. I've tried to create
 reasonable test coverage where I compare to other implementations to ensure
 stability. If you find a bug, please report an issue.
 
-The version of `v` as of this writing is `V 0.2.1 c6099df`. I intend to ensure
+The version of `v` as of this writing is `V 0.4.0 2e9f8e6`. I intend to ensure
 everything is working as long as possible.

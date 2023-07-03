@@ -39,8 +39,8 @@ fn example_custom_values(n []int) {
 }
 
 fn display_result(n []int, encoded string, decoded []int, min_length int) {
-	println('with an instance with minimum length $min_length')
-	println(' > given $n we encode to "$encoded"')
-	println(' > decoding "$encoded" back gives $decoded')
+	println('with an instance with minimum length ${min_length}')
+	println(' > given ${n} we encode to "${encoded}"')
+	println(' > decoding "${encoded}" back gives ${decoded}')
 	println('')
 }

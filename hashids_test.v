@@ -71,17 +71,17 @@ fn test_consistent_shuffle() {
 	consistent_shuffle(do_not_change_me, string_to_slice('some salty salt'))
 	assert array_eq(do_not_change_me, do_not_change_me_orig)
 	if !array_eq(do_not_change_me, do_not_change_me_orig) {
-		println('do not change me was: $do_not_change_me_orig')
-		println('do not change me is:  $do_not_change_me')
+		println('do not change me was: ${do_not_change_me_orig}')
+		println('do not change me is:  ${do_not_change_me}')
 	} else {
 		print("i'm just printing this due to https://github.com/vlang/v/issues/3420")
 	}
 }
 
 fn test_custom_alphabets() {
-	cases := ['cCsSfFhHuUiItT01', 'abdegjklCFHISTUc', 'abdegjklmnopqrSF', 'abdegjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890',
-		'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+\\|";:/?.>,<{[}]',
-	]
+	cases := ['cCsSfFhHuUiItT01', 'abdegjklCFHISTUc', 'abdegjklmnopqrSF',
+		'abdegjklmnopqrvwxyzABDEGJKLMNOPQRVWXYZ1234567890',
+		'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`~!@#$%^&*()-_=+\\|";:/?.>,<{[}]']
 	numbers := [1, 2, 3]
 	for _, c in cases {
 		hid := new_with_config(c, 'my salt', 0)

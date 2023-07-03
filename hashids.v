@@ -26,23 +26,23 @@ struct HashID {
 // decoding hashes. This will use default values for alphabet, salt and minimum
 // hash length.
 pub fn new() HashID {
-	return new_with_config(default_alphabet, default_salt, default_min_hash_length)
+	return new_with_config(hashids.default_alphabet, hashids.default_salt, hashids.default_min_hash_length)
 }
 
 // new_with_salt will create a HashID instance with a desired salt.
 pub fn new_with_salt(salt string) HashID {
-	return new_with_config(default_alphabet, salt, default_min_hash_length)
+	return new_with_config(hashids.default_alphabet, salt, hashids.default_min_hash_length)
 }
 
 // new_with_config will create a HashID instance with desired alphabet, salt and
 // minimum hash length.
 pub fn new_with_config(alphabet_str string, salt_str string, min_length int) HashID {
 	mut alphabet := alphabet_str.split('')
-	mut separators := default_separators.split('')
+	mut separators := hashids.default_separators.split('')
 	mut guards := []string{}
 	salt := salt_str.split('')
 
-	if alphabet.len < min_alphabet_length {
+	if alphabet.len < hashids.min_alphabet_length {
 		panic('alphabet too short')
 	}
 
@@ -59,8 +59,8 @@ pub fn new_with_config(alphabet_str string, salt_str string, min_length int) Has
 	alphabet = remove_in(alphabet, separators)
 
 	separators = consistent_shuffle(separators, salt)
-	if separators.len == 0 || f64(alphabet.len / separators.len) > ratio_separators {
-		mut separators_length := int(math.ceil(f64(alphabet.len) / ratio_separators))
+	if separators.len == 0 || f64(alphabet.len / separators.len) > hashids.ratio_separators {
+		mut separators_length := int(math.ceil(f64(alphabet.len) / hashids.ratio_separators))
 
 		if separators_length == 1 {
 			separators_length = 2
@@ -76,7 +76,7 @@ pub fn new_with_config(alphabet_str string, salt_str string, min_length int) Has
 	}
 
 	alphabet = consistent_shuffle(alphabet, salt)
-	guard_count := int(math.ceil(f64(alphabet.len) / ratio_guards))
+	guard_count := int(math.ceil(f64(alphabet.len) / hashids.ratio_guards))
 
 	if alphabet.len < 3 {
 		guards = separators[..guard_count]
@@ -256,7 +256,7 @@ fn hash(num int, alphabet []string) []string {
 
 	for num_copy > 0 {
 		alphabet_part := alphabet[num_copy % alphabet.len]
-		result = '$alphabet_part$result'
+		result = '${alphabet_part}${result}'
 		num_copy = num_copy / alphabet.len
 	}
 
@@ -357,7 +357,7 @@ fn remove_not_in(a []string, b []string) []string {
 	mut final_arr := []string{}
 
 	for x in a {
-		if !(x in b) {
+		if x !in b {
 			continue
 		}
 
